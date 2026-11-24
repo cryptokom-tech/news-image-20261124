@@ -38,6 +38,12 @@ def main():
         return fail("entry.png does not start with the PNG signature")
     if data[12:16] != b"IHDR":
         return fail("entry.png has no IHDR chunk where one is expected")
+    ihdr_length = struct.unpack(">I", data[8:12])[0]
+    if ihdr_length != 13:
+        return fail("entry.png has an IHDR chunk of %d bytes, not 13"
+                    % ihdr_length)
+    if b"IEND" not in data[-12:]:
+        return fail("entry.png has no IEND trailer")
 
     width, height = struct.unpack(">II", data[16:24])
     if width == 0 or height == 0:
